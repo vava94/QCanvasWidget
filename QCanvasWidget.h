@@ -20,9 +20,11 @@ class QCanvasWidget: public QWidget {
 public:
     enum DrawArguments {
         ORIGINAL_SIZE,
+        FILL,
         FIT,
         FIT_BY_WIDTH,
-        FIT_BY_HEIGHT
+        FIT_BY_HEIGHT,
+        SPAN
     } ;
 
     explicit QCanvasWidget(QWidget *parent = 0);
@@ -31,8 +33,10 @@ public:
     void clear() { clear(mDefaultColor); }
     void clear(QColor backgroundColor);
     void drawImage(QBitmap& bitmap, DrawArguments argument = DrawArguments::ORIGINAL_SIZE);
+    void drawImage(QImage& image, DrawArguments argument = DrawArguments::ORIGINAL_SIZE);
     void drawImage(uchar *data, int width, int height, QImage::Format format = QImage::Format_RGBA8888, DrawArguments argument = DrawArguments::ORIGINAL_SIZE);
     void setImage(QBitmap& bitmap, DrawArguments argument = DrawArguments::ORIGINAL_SIZE);
+    void setImage(QImage image, DrawArguments argument = DrawArguments::ORIGINAL_SIZE);
     void setImage(uchar *data, int width, int height, QImage::Format format = QImage::Format_RGBA8888, DrawArguments argument = DrawArguments::ORIGINAL_SIZE);
 
 protected:
@@ -45,9 +49,9 @@ private:
 
     DrawArguments mCurrentArgument = DrawArguments::ORIGINAL_SIZE;
 
-    QBitmap mOriginalBitmap;
+    //QBitmap mOriginalBitmap;
     QColor mDefaultColor = QColor::fromRgb(25,25,25);
-    QImage mImageToDraw;
+    QImage mImageToDraw, mSourceImage;
 
     void scaleImage(DrawArguments argument);
 

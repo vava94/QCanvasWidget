@@ -11,6 +11,7 @@ QCanvasWidget::QCanvasWidget(QWidget *parent) {
 }
 
 void QCanvasWidget::clear(QColor backgroundColor) {
+    mSourceImage = QImage();
     mImageToDraw = QImage(width(), height(), QImage::Format_RGB888);
     mImageToDraw.fill(mDefaultColor);
     update();
@@ -45,38 +46,58 @@ void QCanvasWidget::paintEvent(QPaintEvent *event) {
 
 void QCanvasWidget::resizeEvent(QResizeEvent *event) {
     Q_UNUSED(event);
-    if (mImageToDraw.isNull() || mOriginalBitmap.isNull()) {
+    if (mImageToDraw.isNull() || mSourceImage.isNull()) {
         clear();
     } else {
-        setImage(mOriginalBitmap, mCurrentArgument);
+        setImage(mSourceImage, mCurrentArgument);
     }
 }
 
 void QCanvasWidget::setImage(QBitmap &bitmap, DrawArguments argument) {
-    mOriginalBitmap = bitmap;
+    setImage(bitmap.toImage(), argument);
+}
+
+void QCanvasWidget::setImage(QImage image, DrawArguments argument) {
+    mSourceImage = image;
     mCurrentArgument = argument;
     switch (argument) {
         case ORIGINAL_SIZE:
-            mImageToDraw = mOriginalBitmap.toImage();
+            mImageToDraw = mSourceImage;
+            break;
+        case FILL:
+            mImageToDraw = mSourceImage.scaled(width(),height());
             break;
         case FIT:
-            mImageToDraw = mOriginalBitmap.scaled(width(),height()).toImage();
+            if ((mSourceImage.width() * 1.0 / mSourceImage.height()) > (width() * 1.0 / height())) {
+                mImageToDraw = mSourceImage.scaledToHeight(height());
+            }
+            else {
+                mImageToDraw = mSourceImage.scaledToWidth(width());
+            }
             break;
         case FIT_BY_WIDTH:
-            mImageToDraw = mOriginalBitmap.scaledToWidth(width()).toImage();
+            mImageToDraw = mSourceImage.scaledToWidth(width());
             break;
         case FIT_BY_HEIGHT:
-            mImageToDraw = mOriginalBitmap.scaledToHeight(height()).toImage();
+            mImageToDraw = mSourceImage.scaledToHeight(height());
+            break;
+        case SPAN:
+            if ((mSourceImage.width() * 1.0 / mSourceImage.height()) < (width() * 1.0 / height())) {
+                mImageToDraw = mSourceImage.scaledToWidth(width());
+            }
+            else {
+                mImageToDraw = mSourceImage.scaledToHeight(height());
+            }
             break;
     }
 }
 
 void QCanvasWidget::setImage(uchar *data, int width, int height, QImage::Format format, DrawArguments argument) {
-    auto bitmap = QBitmap::fromData(QSize(width, height), data, format);
-    setImage(bitmap, argument);
+    mSourceImage = QImage(data, width, height, QImage::Format_RGB888);
+    setImage(mSourceImage, argument);
 }
 
 QCanvasWidget::~QCanvasWidget() noexcept {
-    mOriginalBitmap.clear();
+    mSourceImage = QImage();
     mImageToDraw = QImage();
 }
