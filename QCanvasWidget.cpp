@@ -6,6 +6,9 @@
 
 #include "QCanvasWidget.h"
 
+#include <utility>
+#include <iostream>
+
 QCanvasWidget::QCanvasWidget(QWidget *parent) {
     mImageToDraw = QImage();
 }
@@ -58,8 +61,9 @@ void QCanvasWidget::setImage(QBitmap &bitmap, DrawArguments argument) {
 }
 
 void QCanvasWidget::setImage(QImage image, DrawArguments argument) {
-    mSourceImage = image;
+    mSourceImage = std::move(image);
     mCurrentArgument = argument;
+    if(!width() || mSourceImage.isNull()) return;
     switch (argument) {
         case ORIGINAL_SIZE:
             mImageToDraw = mSourceImage;
@@ -93,7 +97,7 @@ void QCanvasWidget::setImage(QImage image, DrawArguments argument) {
 }
 
 void QCanvasWidget::setImage(uchar *data, int width, int height, QImage::Format format, DrawArguments argument) {
-    mSourceImage = QImage(data, width, height, QImage::Format_RGB888);
+    mSourceImage = QImage(data, width, height, format);
     setImage(mSourceImage, argument);
 }
 
