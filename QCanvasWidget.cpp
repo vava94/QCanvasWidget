@@ -73,10 +73,10 @@ void QCanvasWidget::setImage(QImage image, DrawArguments argument) {
             break;
         case FIT:
             if ((mSourceImage.width() * 1.0 / mSourceImage.height()) > (width() * 1.0 / height())) {
-                mImageToDraw = mSourceImage.scaledToHeight(height());
+                mImageToDraw = mSourceImage.scaledToWidth(width());
             }
             else {
-                mImageToDraw = mSourceImage.scaledToWidth(width());
+                mImageToDraw = mSourceImage.scaledToHeight(height());
             }
             break;
         case FIT_BY_WIDTH:
