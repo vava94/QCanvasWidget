@@ -11,12 +11,11 @@
 
 QCanvasWidget::QCanvasWidget(QWidget *parent) {
     mImageToDraw = QImage();
+    mBackgroundImage = QImage();
 }
 
 void QCanvasWidget::clear(QColor backgroundColor) {
     mSourceImage = QImage();
-    mImageToDraw = QImage(width(), height(), QImage::Format_RGB888);
-    mImageToDraw.fill(mDefaultColor);
     update();
 }
 
@@ -33,7 +32,6 @@ void QCanvasWidget::drawImage(uchar *data, int width, int height, QImage::Format
 void QCanvasWidget::paintEvent(QPaintEvent *event) {
     QWidget::paintEvent(event);
     QPainter painter(this);
-
     if (mImageToDraw.width() < width()) {
         mStartX = (int)((width() - mImageToDraw.width()) * 0.5);
     } else {
@@ -44,7 +42,9 @@ void QCanvasWidget::paintEvent(QPaintEvent *event) {
     } else {
         mStartY = 0;
     }
+    painter.drawPixmap(0,0,QPixmap::fromImage(mBackgroundImage));
     painter.drawPixmap(mStartX, mStartY, QPixmap::fromImage(mImageToDraw));
+
 }
 
 void QCanvasWidget::resizeEvent(QResizeEvent *event) {
@@ -54,6 +54,8 @@ void QCanvasWidget::resizeEvent(QResizeEvent *event) {
     } else {
         setImage(mSourceImage, mCurrentArgument);
     }
+    mBackgroundImage = QImage(width(), height(), QImage::Format_RGB888);
+    mBackgroundImage.fill(mDefaultColor);
 }
 
 void QCanvasWidget::setImage(QBitmap &bitmap, DrawArguments argument) {

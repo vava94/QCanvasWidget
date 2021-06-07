@@ -51,9 +51,9 @@ private:
 
     //QBitmap mOriginalBitmap;
     QColor mDefaultColor = QColor::fromRgb(25,25,25);
-    QImage mImageToDraw, mSourceImage;
+    QImage mBackgroundImage, mImageToDraw, mSourceImage;
 
-    void scaleImage(DrawArguments argument);
+
 
 };
 
