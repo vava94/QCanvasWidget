@@ -7,7 +7,7 @@
 #include "QCanvasWidget.h"
 
 #include <utility>
-#include <iostream>
+
 
 QCanvasWidget::QCanvasWidget(QWidget *parent) {
     mImageToDraw = QImage();
